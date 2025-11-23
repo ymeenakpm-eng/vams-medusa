@@ -1,17 +1,16 @@
 import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 
+// Disable bundled admin UI (we’ll use only the API on Railway)
 process.env.MEDUSA_ADMIN_DISABLED = "true"
 
-// This can stay; it won't hurt even if we don't use env vars
+// Load .env files based on NODE_ENV (still safe to keep)
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
 module.exports = defineConfig({
   projectConfig: {
-    // Database & Redis – hard‑coded to your Railway internal URLs
-    databaseUrl:
-      "postgresql://postgres:FYiEklSNPLNylsKopjUyVsLoizuGiOLU@postgres.railway.internal:5432/railway",
-    redisUrl:
-      "redis://default:oWwLvLOHeVKISksLnTHyVRKHvIGrbNVk@redis.railway.internal:6379",
+    // Use DATABASE_URL and REDIS_URL from environment (Railway)
+    databaseUrl: process.env.DATABASE_URL,
+    redisUrl: process.env.REDIS_URL,
 
     http: {
       // CORS – allow local dev + your Vercel frontend
@@ -22,9 +21,9 @@ module.exports = defineConfig({
       authCors:
         "http://localhost:3000,https://vams-biome-frontend.vercel.app",
 
-      // Secrets – you can change these to longer random strings
-      jwtSecret: "supersecret",
-      cookieSecret: "supersecret",
+      // Secrets – you can replace with long random strings
+      jwtSecret: process.env.JWT_SECRET || "supersecret",
+      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
   },
 })
