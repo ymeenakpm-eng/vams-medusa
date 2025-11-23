@@ -1,5 +1,7 @@
 import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 
+process.env.MEDUSA_ADMIN_DISABLED = "true"
+
 // This can stay; it won't hurt even if we don't use env vars
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
