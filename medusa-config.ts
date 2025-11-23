@@ -1,29 +1,36 @@
+// medusa-config.ts
 import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 
-// Disable bundled admin UI (we’ll use only the API on Railway)
-process.env.MEDUSA_ADMIN_DISABLED = "true"
-
-// Load .env files based on NODE_ENV (still safe to keep)
+// Load environment variables based on NODE_ENV
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
-module.exports = defineConfig({
+// Common CORS origins (store, admin, etc.)
+const cors =
+  "http://localhost:3000," + // local Next.js / React store
+  "http://localhost:7001," + // local/admin in Docker
+  "https://vams-biome-frontend.vercel.app" // your deployed frontend
+
+export default defineConfig({
   projectConfig: {
-    // Use DATABASE_URL and REDIS_URL from environment (Railway)
+    // Database & Redis (Railway will inject these)
     databaseUrl: process.env.DATABASE_URL,
     redisUrl: process.env.REDIS_URL,
 
     http: {
-      // CORS – allow local dev + your Vercel frontend
-      storeCors:
-        "http://localhost:3000,https://vams-biome-frontend.vercel.app",
-      adminCors:
-        "http://localhost:3000,https://vams-biome-frontend.vercel.app",
-      authCors:
-        "http://localhost:3000,https://vams-biome-frontend.vercel.app",
+      // CORS
+      storeCors: cors,
+      adminCors: cors,
+      authCors: cors,
 
-      // Secrets – you can replace with long random strings
+      // Secrets – for dev you can keep defaults,
+      // in Railway override via env vars
       jwtSecret: process.env.JWT_SECRET || "supersecret",
       cookieSecret: process.env.COOKIE_SECRET || "supersecret",
     },
   },
+
+  // You can add other Medusa modules/plugins here later
+  // modules: {
+  //   // example
+  // },
 })
