@@ -1,20 +1,28 @@
 import { loadEnv, defineConfig } from "@medusajs/framework/utils"
 
+// This can stay; it won't hurt even if we don't use env vars
 loadEnv(process.env.NODE_ENV || "development", process.cwd())
 
 module.exports = defineConfig({
   projectConfig: {
-    // ✅ databaseUrl + redisUrl (camelCase) – required
-    databaseUrl: process.env.DATABASE_URL,
-    redisUrl: process.env.REDIS_URL,
+    // Database & Redis – hard‑coded to your Railway internal URLs
+    databaseUrl:
+      "postgresql://postgres:FYiEklSNPLNylsKopjUyVsLoizuGiOLU@postgres.railway.internal:5432/railway",
+    redisUrl:
+      "redis://default:oWwLvLOHeVKISksLnTHyVRKHvIGrbNVk@redis.railway.internal:6379",
 
     http: {
-      // Add fallbacks so TypeScript sees plain `string`, not `string | undefined`
-      storeCors: process.env.STORE_CORS || "",
-      adminCors: process.env.ADMIN_CORS || "",
-      authCors: process.env.AUTH_CORS || "",
-      jwtSecret: process.env.JWT_SECRET || "supersecret",
-      cookieSecret: process.env.COOKIE_SECRET || "supersecret",
+      // CORS – allow local dev + your Vercel frontend
+      storeCors:
+        "http://localhost:3000,https://vams-biome-frontend.vercel.app",
+      adminCors:
+        "http://localhost:3000,https://vams-biome-frontend.vercel.app",
+      authCors:
+        "http://localhost:3000,https://vams-biome-frontend.vercel.app",
+
+      // Secrets – you can change these to longer random strings
+      jwtSecret: "supersecret",
+      cookieSecret: "supersecret",
     },
   },
 })
