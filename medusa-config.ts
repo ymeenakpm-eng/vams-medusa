@@ -8,7 +8,10 @@ loadEnv(process.env.NODE_ENV || "development", process.cwd())
 const cors =
   "http://localhost:3000," + // local frontend
   "http://localhost:7001," + // local/docker admin
-  "https://vams-biome-frontend.vercel.app" // deployed frontend
+  "https://vams-biome-frontend.vercel.app," + // deployed frontend (legacy)
+  "https://vamsbiome.com," + // production storefront
+  "https://admin.vamsbiome.com," + // production custom admin UI domain
+  "https://vams-custom-admin.vercel.app" // fallback admin UI on vercel.app
 
 export default defineConfig({
   projectConfig: {
