@@ -12,17 +12,18 @@
     "headless",
     "medusa"
   ],
- "scripts": {
-  "build": "medusa build",
-  "seed": "medusa exec ./src/scripts/seed.ts",
-  "start": "medusa start",
-  "dev": "medusa develop",
-  "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
-  "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
-  "test:unit": "TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit",
-  "create-admin-api-key": "medusa exec ./src/scripts/create-admin-api-key.ts",
-  "create-publishable-key": "medusa exec ./src/scripts/create-publishable-key.ts"
-},
+  "scripts": {
+    "build": "medusa build",
+    "seed": "medusa exec ./src/scripts/seed.ts",
+    "start": "medusa start",
+    "dev": "medusa develop",
+
+    "test:integration:http": "TEST_TYPE=integration:http NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
+    "test:integration:modules": "TEST_TYPE=integration:modules NODE_OPTIONS=--experimental-vm-modules jest --silent=false --runInBand --forceExit",
+    "test:unit": "TEST_TYPE=unit NODE_OPTIONS=--experimental-vm-modules jest --silent --runInBand --forceExit",
+
+    "create-admin-api-key": "node -r ts-node/register/transpile-only ./node_modules/@medusajs/medusa/dist/commands/exec.js ./src/scripts/create-admin-api-key.ts"
+  },
   "dependencies": {
     "@medusajs/admin-sdk": "2.11.3",
     "@medusajs/cli": "2.11.3",
@@ -31,6 +32,8 @@
   },
   "devDependencies": {
     "@medusajs/test-utils": "2.11.3",
+    "@swc/core": "^1.7.28",
+    "@swc/jest": "^0.2.36",
     "@types/jest": "^29.5.13",
     "@types/node": "^20.19.25",
     "@types/react": "^18.3.2",
