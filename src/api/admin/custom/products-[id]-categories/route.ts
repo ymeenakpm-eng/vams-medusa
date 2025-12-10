@@ -1,5 +1,5 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import type { EntityManager } from "typeorm"
+
 
 type Body = {
   category_ids?: string[]
@@ -26,7 +26,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     })
   }
 
-  const manager = req.scope.resolve("manager") as EntityManager
+  const manager = req.scope.resolve("manager") as any
 
   await manager.transaction(async (tx) => {
     // Ensure product exists and not soft-deleted
