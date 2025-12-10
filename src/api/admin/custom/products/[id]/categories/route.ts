@@ -9,25 +9,34 @@ type Body = {
  * Add-only: links the product to the given categories, without removing existing ones.
  */
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
-  const productId = req.params.id
-  const { category_ids }: Body = req.body || {}
-
-  if (!Array.isArray(category_ids) || !category_ids.length) {
-    return res.status(400).json({
-      message: "category_ids must be a non-empty array of strings",
-    })
-  }
-
-  const ids = category_ids.map(String).filter(Boolean)
-  if (!ids.length) {
-    return res.status(400).json({
-      message: "category_ids must contain at least one non-empty id",
-    })
-  }
-
-  const manager = req.scope.resolve("manager") as any
-
   try {
+    const productId = req.params.id
+
+    let body: Body = {}
+    try {
+      // In Medusa v2, JSON body is usually accessed via req.json()
+      body = ((req as any).body as Body) ?? (await (req as any).json?.()) ?? {}
+    } catch {
+      body = {}
+    }
+
+    const { category_ids } = body
+
+    if (!Array.isArray(category_ids) || !category_ids.length) {
+      return res.status(400).json({
+        message: "category_ids must be a non-empty array of strings",
+      })
+    }
+
+    const ids = category_ids.map(String).filter(Boolean)
+    if (!ids.length) {
+      return res.status(400).json({
+        message: "category_ids must contain at least one non-empty id",
+      })
+    }
+
+    const manager = req.scope.resolve("manager") as any
+
     await manager.transaction(async (tx: any) => {
       // Ensure product exists and not soft-deleted
       const prod = await tx.query(
