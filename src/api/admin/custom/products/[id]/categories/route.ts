@@ -35,11 +35,14 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       })
     }
 
-    const manager = req.scope.resolve("manager") as any
+    // Use the primary Postgres connection from Medusa's container
+    const pg = req.scope.resolve("pgConnection") as any
 
-    await manager.transaction(async (tx: any) => {
+    // Manual transaction so we don't depend on TypeORM's EntityManager
+    await pg.query("BEGIN")
+    try {
       // Ensure product exists and not soft-deleted
-      const prod = await tx.query(
+      const prod = await pg.query(
         `select id from product where id = $1 and deleted_at is null`,
         [productId],
       )
@@ -48,7 +51,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       }
 
       // Keep only existing categories
-      const cats = await tx.query(
+      const cats = await pg.query(
         `select id
            from product_category
           where id = ANY($1::text[])
@@ -61,7 +64,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       }
 
       // INSERT only missing links (add-only)
-      await tx.query(
+      await pg.query(
         `insert into product_category_product (product_id, product_category_id)
          select $1 as product_id, id as product_category_id
            from product_category
@@ -75,7 +78,14 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
             )`,
         [productId, validCatIds],
       )
-    })
+
+      await pg.query("COMMIT")
+    } catch (inner: any) {
+      try {
+        await pg.query("ROLLBACK")
+      } catch {}
+      throw inner
+    }
 
     return res.status(200).json({
       product_id: productId,
